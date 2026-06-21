@@ -1,26 +1,27 @@
 from flask import Flask, request, jsonify
-import requests
+from pipeline_runner import run
 
 app = Flask(__name__)
 
-def run_cycle(batch):
-    return {
-        "batch": batch,
-        "brain": {"action": "INCREASE_BID", "score": 2},
-        "control": {"task": "hold_position"},
-        "execution": {"status": "SUCCESS"},
-        "status": "COMPLETED"
-    }
 
 @app.route('/run', methods=['POST'])
-def run():
-    data = request.json
-    batch = data.get("files", [])
-    return jsonify(run_cycle(batch))
+def run_route():
+    data = request.json or {}
+    files = data.get("files", [])
+
+    if not isinstance(files, list):
+        return jsonify({"error": "files must be list"}), 400
+
+    # 🚀 V3.6 正式链路入口（关键修复点）
+    result = run(files)
+
+    return jsonify(result)
+
 
 @app.route('/health')
 def health():
-    return {"status": "OK"}
+    return {"status": "V3.6_FIXED_OK"}
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
