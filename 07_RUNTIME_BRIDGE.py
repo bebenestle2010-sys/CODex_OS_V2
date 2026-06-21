@@ -1,5 +1,39 @@
 import subprocess
+import sys
+import os
+from 03_EXECUTION.pipeline_executor import run_pipeline
 
+
+# 添加 execution path（关键）
+sys.path.append(os.path.join(os.path.dirname(__file__), "03_EXECUTION"))
+
+from pipeline_executor import run_pipeline
+
+
+class CODexRuntimeBridge:
+
+    def __init__(self):
+        self.status = "ACTIVE"
+
+    def trigger_pipeline(self, batch_id, force=False):
+        print("[RUNTIME BRIDGE] trigger pipeline:", batch_id)
+
+        result = run_pipeline(batch_id)
+
+        print("[RUNTIME BRIDGE DONE]", result)
+
+        return result
+class CODexRuntimeBridge:
+
+    def __init__(self):
+        self.status = "ACTIVE"
+
+    def trigger_pipeline(self, batch_id, force=False):
+        print("[BRIDGE] trigger pipeline:", batch_id)
+
+        result = run_pipeline(batch_id)
+
+        return result
 class RuntimeBridge:
 
     def __init__(self, server="admin@47.82.217.49"):
