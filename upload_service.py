@@ -1,5 +1,6 @@
-﻿from upload_trigger import upload_trigger
-from flask import Flask, request, jsonify
+﻿from flask import Flask, request, jsonify
+from task_queue import push
+import uuid
 
 app = Flask(__name__)
 
@@ -9,16 +10,27 @@ def upload():
     data = request.json or {}
     files = data.get("files", [])
 
-    result = upload_trigger(files)
+    if not isinstance(files, list):
+        return jsonify({"error": "files must be list"}), 400
 
-    return jsonify(result)
+    task = {
+        "task_id": str(uuid.uuid4()),
+        "files": files
+    }
+
+    push(task)
+
+    return jsonify({
+        "status": "queued",
+        "task_id": task["task_id"]
+    })
 
 
 @app.route("/health")
 def health():
-    return {"status": "UPLOAD_V3_7_OK"}
+    return {"status": "UPLOAD_V3_OK"}
 
 
 if __name__ == "__main__":
-    print("🚀 Upload Service V3.7 Started")
+    print("🚀 UPLOAD SERVICE STARTED V3.9")
     app.run(host="0.0.0.0", port=9000)
